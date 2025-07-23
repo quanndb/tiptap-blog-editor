@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Section } from "./section";
 import { Button } from "@/components/ui/button";
-import { Plus, Eye, Edit, Globe, Languages } from "lucide-react";
-import { PublishModal } from "./publish-modal";
-import { Send } from "lucide-react";
+import { Edit, Eye, Globe, Languages, Plus, Send } from "lucide-react";
+import { useState } from "react";
 import { BlogPreview } from "./blog-preview";
 import { LanguageManager } from "./language-manager";
+import { PublishModal } from "./publish-modal";
+import { Section } from "./section";
 
 export interface Block {
   id: string;
@@ -304,7 +303,7 @@ export function BlogEditor() {
             const text = block.content.html.replace(/<[^>]*>/g, "");
             wordCount += text
               .split(/\s+/)
-              .filter((word) => word.length > 0).length;
+              .filter((word: string) => word.length > 0).length;
           }
         });
       });

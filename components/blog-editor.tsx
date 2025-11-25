@@ -19,9 +19,14 @@ export interface Column {
   blocks: Block[];
 }
 
-export interface SectionData {
+export interface Row {
   id: string;
   columns: Column[];
+}
+
+export interface SectionData {
+  id: string;
+  rows: Row[];
 }
 
 export interface LanguageVersion {
@@ -36,16 +41,21 @@ export interface LanguageVersion {
 const initialSections: SectionData[] = [
   {
     id: "section-1",
-    columns: [
+    rows: [
       {
-        id: "col-1",
-        blocks: [
+        id: "row-1",
+        columns: [
           {
-            id: "block-1",
-            type: "text",
-            content: {
-              html: "<p>Vườn Quốc gia Du Già là một kho tàng đa dạng sinh học vô cùng phong phú với 318 loài động vật có xương sống trên cạn, gồm 72 loài thú, 162 loài chim, 84 loài bò sát và lưỡng cư. Đây là ngôi nhà của nhiều loài quý hiếm, đặc hữu và có tên trong Sách Đỏ, đặc biệt loài Voọc mũi hếch - một trong 25 loài linh trưởng đang bị đe dọa tuyệt chủng cao nhất trên thế giới hiện nay.</p>",
-            },
+            id: "col-1",
+            blocks: [
+              {
+                id: "block-1",
+                type: "text",
+                content: {
+                  html: "<p>Vườn Quốc gia Du Già là một kho tàng đa dạng sinh học vô cùng phong phú với 318 loài động vật có xương sống trên cạn, gồm 72 loài thú, 162 loài chim, 84 loài bò sát và lưỡng cư. Đây là ngôi nhà của nhiều loài quý hiếm, đặc hữu và có tên trong Sách Đỏ, đặc biệt loài Voọc mũi hếch - một trong 25 loài linh trưởng đang bị đe dọa tuyệt chủng cao nhất trên thế giới hiện nay.</p>",
+                },
+              },
+            ],
           },
         ],
       },
@@ -53,16 +63,21 @@ const initialSections: SectionData[] = [
   },
   {
     id: "section-1753176792856",
-    columns: [
+    rows: [
       {
-        id: "col-1753176792856",
-        blocks: [
+        id: "row-1753176792856",
+        columns: [
           {
-            id: "block-1753176801674",
-            type: "text",
-            content: {
-              html: "<h1>01. Voọc mũi hếch</h1><p></p>",
-            },
+            id: "col-1753176792856",
+            blocks: [
+              {
+                id: "block-1753176801674",
+                type: "text",
+                content: {
+                  html: "<h1>01. Voọc mũi hếch</h1><p></p>",
+                },
+              },
+            ],
           },
         ],
       },
@@ -70,30 +85,35 @@ const initialSections: SectionData[] = [
   },
   {
     id: "section-1753176887094",
-    columns: [
+    rows: [
       {
-        id: "col-1753176887094",
-        blocks: [
+        id: "row-1753176887094",
+        columns: [
           {
-            id: "block-1753176915774",
-            type: "text",
-            content: {
-              html: "<p><strong>Tên khoa học: Rhinopithecus avunculus</strong></p><p></p><p>Voọc mũi hếch, một loài linh trưởng đặc biệt, sống chủ yếu ở trên cây tại vùng núi cao rừng nhiệt đới. Vườn Quốc gia Du Già là môi trường lý tưởng của chúng, và chiếc mũi hếch đặc trưng đã làm cho chúng trở thành biểu tượng của khu rừng nhiệt đới. Chúng thường tập trung thành bầy đàn và chia thành các nhóm nhỏ dưới sự lãnh đạo của một con đực trưởng thành.Start writing...</p>",
-            },
+            id: "col-1753176887094",
+            blocks: [
+              {
+                id: "block-1753176915774",
+                type: "text",
+                content: {
+                  html: "<p><strong>Tên khoa học: Rhinopithecus avunculus</strong></p><p></p><p>Voọc mũi hếch, một loài linh trưởng đặc biệt, sống chủ yếu ở trên cây tại vùng núi cao rừng nhiệt đới. Vườn Quốc gia Du Già là môi trường lý tưởng của chúng, và chiếc mũi hếch đặc trưng đã làm cho chúng trở thành biểu tượng của khu rừng nhiệt đới. Chúng thường tập trung thành bầy đàn và chia thành các nhóm nhỏ dưới sự lãnh đạo của một con đực trưởng thành.Start writing...</p>",
+                },
+              },
+            ],
           },
-        ],
-      },
-      {
-        id: "col-1753176894569",
-        blocks: [
           {
-            id: "block-1753176941060",
-            type: "image",
-            content: {
-              src: "https://firebasestorage.googleapis.com/v0/b/introduction-national-forests.appspot.com/o/national_forests%2Fanimal%2F1%2Fd24d27fae238bcb8c3bf690dacd8f608.jpg?alt=media&token=578b970a-8ec1-41d8-820b-868eee40145e",
-              alt: "abc",
-              caption: "Nguồn ABC",
-            },
+            id: "col-1753176894569",
+            blocks: [
+              {
+                id: "block-1753176941060",
+                type: "image",
+                content: {
+                  src: "https://firebasestorage.googleapis.com/v0/b/introduction-national-forests.appspot.com/o/national_forests%2Fanimal%2F1%2Fd24d27fae238bcb8c3bf690dacd8f608.jpg?alt=media&token=578b970a-8ec1-41d8-820b-868eee40145e",
+                  alt: "abc",
+                  caption: "Nguồn ABC",
+                },
+              },
+            ],
           },
         ],
       },
@@ -101,16 +121,21 @@ const initialSections: SectionData[] = [
   },
   {
     id: "section-1753177035890",
-    columns: [
+    rows: [
       {
-        id: "col-1753177035890",
-        blocks: [
+        id: "row-1753177035890",
+        columns: [
           {
-            id: "block-1753177038504",
-            type: "text",
-            content: {
-              html: "<p>Voọc mũi hếch là loài đặc hữu hẹp, chỉ phân bố ở một số tỉnh thuộc Đông Bắc Việt Nam. Hiện tại, quần thể Voọc mũi hếch có khoảng 108 - 113 cá thể, chiếm gần 50% tổng số cá thể Voọc mũi hếch hiện nay ở Việt Nam. Do số lượng giảm sút đáng kể, Voọc mũi hếch hiện đang được bảo vệ và đưa vào Sách Đỏ. Việc bảo tồn loài linh trưởng quý hiếm này không chỉ góp phần bảo vệ đa dạng sinh học mà còn giữ gìn vẻ đẹp tự nhiên của các khu rừng nhiệt đới.</p>",
-            },
+            id: "col-1753177035890",
+            blocks: [
+              {
+                id: "block-1753177038504",
+                type: "text",
+                content: {
+                  html: "<p>Voọc mũi hếch là loài đặc hữu hẹp, chỉ phân bố ở một số tỉnh thuộc Đông Bắc Việt Nam. Hiện tại, quần thể Voọc mũi hếch có khoảng 108 - 113 cá thể, chiếm gần 50% tổng số cá thể Voọc mũi hếch hiện nay ở Việt Nam. Do số lượng giảm sút đáng kể, Voọc mũi hếch hiện đang được bảo vệ và đưa vào Sách Đỏ. Việc bảo tồn loài linh trưởng quý hiếm này không chỉ góp phần bảo vệ đa dạng sinh học mà còn giữ gìn vẻ đẹp tự nhiên của các khu rừng nhiệt đới.</p>",
+                },
+              },
+            ],
           },
         ],
       },
@@ -118,32 +143,37 @@ const initialSections: SectionData[] = [
   },
   {
     id: "section-1753177076369",
-    columns: [
+    rows: [
       {
-        id: "col-1753177076369",
-        blocks: [
+        id: "row-1753177076369",
+        columns: [
           {
-            id: "block-1753177100181",
-            type: "image",
-            content: {
-              src: "https://firebasestorage.googleapis.com/v0/b/introduction-national-forests.appspot.com/o/national_forests%2Fanimal%2F1%2F247a9324ea8937dd0115c3623023ec4e.jpg?alt=media&token=ae63a778-1397-4a67-9e32-200546c05add",
-              alt: "",
-              caption: "Nguồn ABC",
-            },
+            id: "col-1753177076369",
+            blocks: [
+              {
+                id: "block-1753177100181",
+                type: "image",
+                content: {
+                  src: "https://firebasestorage.googleapis.com/v0/b/introduction-national-forests.appspot.com/o/national_forests%2Fanimal%2F1%2F247a9324ea8937dd0115c3623023ec4e.jpg?alt=media&token=ae63a778-1397-4a67-9e32-200546c05add",
+                  alt: "",
+                  caption: "Nguồn ABC",
+                },
+              },
+            ],
           },
-        ],
-      },
-      {
-        id: "col-1753177078541",
-        blocks: [
           {
-            id: "block-1753177122184",
-            type: "image",
-            content: {
-              src: "https://firebasestorage.googleapis.com/v0/b/introduction-national-forests.appspot.com/o/national_forests%2Fanimal%2F1%2Ffecae71832deef95ea945b0bc790bf7a.jpg?alt=media&token=66f85b18-78d6-4b6e-a360-df179281cf15",
-              alt: "",
-              caption: "Nguồn ABC",
-            },
+            id: "col-1753177078541",
+            blocks: [
+              {
+                id: "block-1753177122184",
+                type: "image",
+                content: {
+                  src: "https://firebasestorage.googleapis.com/v0/b/introduction-national-forests.appspot.com/o/national_forests%2Fanimal%2F1%2Ffecae71832deef95ea945b0bc790bf7a.jpg?alt=media&token=66f85b18-78d6-4b6e-a360-df179281cf15",
+                  alt: "",
+                  caption: "Nguồn ABC",
+                },
+              },
+            ],
           },
         ],
       },
@@ -151,19 +181,24 @@ const initialSections: SectionData[] = [
   },
   {
     id: "section-1753177994908",
-    columns: [
+    rows: [
       {
-        id: "col-1753177994908",
-        blocks: [
+        id: "row-1753177994908",
+        columns: [
           {
-            id: "block-1753177997771",
-            type: "embed",
-            content: {
-              title: "Embed Content",
-              iframe:
-                '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3936.0707847893914!2d105.3626985!3d21.0812013!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313461542bb47287%3A0xfc1784f698c57611!2zVsaw4budbiBRdeG7kWMgZ2lhIEJhIFbDrA!5e1!3m2!1svi!2s!4v1753178005407!5m2!1svi!2s" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>',
-              url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3936.0707847893914!2d105.3626985!3d21.0812013!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313461542bb47287%3A0xfc1784f698c57611!2zVsaw4budbiBRdeG7kWMgZ2lhIEJhIFbDrA!5e1!3m2!1svi!2s!4v1753178005407!5m2!1svi!2s",
-            },
+            id: "col-1753177994908",
+            blocks: [
+              {
+                id: "block-1753177997771",
+                type: "embed",
+                content: {
+                  title: "Embed Content",
+                  iframe:
+                    '<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3936.0707847893914!2d105.3626985!3d21.0812013!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313461542bb47287%3A0xfc1784f698c57611!2zVsaw4budbiBRdeG7kWMgZ2lhIEJhIFbDrA!5e1!3m2!1svi!2s!4v1753178005407!5m2!1svi!2s" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>',
+                  url: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3936.0707847893914!2d105.3626985!3d21.0812013!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x313461542bb47287%3A0xfc1784f698c57611!2zVsaw4budbiBRdeG7kWMgZ2lhIEJhIFbDrA!5e1!3m2!1svi!2s!4v1753178005407!5m2!1svi!2s",
+                },
+              },
+            ],
           },
         ],
       },
@@ -212,12 +247,18 @@ export function BlogEditor() {
   };
 
   const addSection = () => {
+    const timestamp = Date.now();
     const newSection: SectionData = {
-      id: `section-${Date.now()}`,
-      columns: [
+      id: `section-${timestamp}`,
+      rows: [
         {
-          id: `col-${Date.now()}`,
-          blocks: [],
+          id: `row-${timestamp}`,
+          columns: [
+            {
+              id: `col-${timestamp + 1}`,
+              blocks: [],
+            },
+          ],
         },
       ],
     };
@@ -297,14 +338,16 @@ export function BlogEditor() {
   const calculateWordCount = (sections: SectionData[]) => {
     let wordCount = 0;
     sections.forEach((section) => {
-      section.columns.forEach((column) => {
-        column.blocks.forEach((block) => {
-          if (block.type === "text" && block.content.html) {
-            const text = block.content.html.replace(/<[^>]*>/g, "");
-            wordCount += text
-              .split(/\s+/)
-              .filter((word: string) => word.length > 0).length;
-          }
+      section.rows.forEach((row) => {
+        row.columns.forEach((column) => {
+          column.blocks.forEach((block) => {
+            if (block.type === "text" && block.content.html) {
+              const text = block.content.html.replace(/<[^>]*>/g, "");
+              wordCount += text
+                .split(/\s+/)
+                .filter((word: string) => word.length > 0).length;
+            }
+          });
         });
       });
     });

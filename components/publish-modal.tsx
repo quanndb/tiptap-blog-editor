@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Eye, Globe, Plus, Send, X } from "lucide-react";
 import { useState } from "react";
-import type { LanguageVersion, SectionData } from "./blog-editor";
+import type { Block, LanguageVersion, SectionData } from "./blog-editor";
 
 interface PublishModalProps {
   isOpen: boolean;
@@ -98,57 +98,50 @@ export function PublishModal({
     }
   };
 
-  const getPreviewData = () => {
-    const wordCount = sections.reduce((count, section) => {
+  const aggregateBlocks = (
+    sectionData: SectionData[],
+    mapper: (block: Block) => number
+  ): number => {
+    return sectionData.reduce((total, section) => {
       return (
-        count +
-        section.columns.reduce((colCount, column) => {
+        total +
+        section.rows.reduce((rowTotal, row) => {
           return (
-            colCount +
-            column.blocks.reduce((blockCount, block) => {
-              if (block.type === "text" && block.content.html) {
-                const text = block.content.html.replace(/<[^>]*>/g, "");
-                return (
-                  blockCount +
-                  text.split(/\s+/).filter((word: string) => word.length > 0)
-                    .length
-                );
-              }
-              return blockCount;
+            rowTotal +
+            row.columns.reduce((colTotal, column) => {
+              return (
+                colTotal +
+                column.blocks.reduce(
+                  (blockTotal, block) => blockTotal + mapper(block),
+                  0
+                )
+              );
             }, 0)
           );
         }, 0)
       );
     }, 0);
-
-    const imageCount = sections.reduce((count, section) => {
-      return (
-        count +
-        section.columns.reduce((colCount, column) => {
-          return (
-            colCount +
-            column.blocks.filter((block) => block.type === "image").length
-          );
-        }, 0)
-      );
-    }, 0);
-
-    const embedCount = sections.reduce((count, section) => {
-      return (
-        count +
-        section.columns.reduce((colCount, column) => {
-          return (
-            colCount +
-            column.blocks.filter((block) => block.type === "embed").length
-          );
-        }, 0)
-      );
-    }, 0);
-
-    return { wordCount, imageCount, embedCount };
   };
 
-  const { wordCount, imageCount, embedCount } = getPreviewData();
+  const getWordCount = (data: SectionData[]) =>
+    aggregateBlocks(data, (block) => {
+      if (block.type === "text" && block.content.html) {
+        const text = block.content.html.replace(/<[^>]*>/g, "");
+        return text.split(/\s+/).filter((word: string) => word.length > 0)
+          .length;
+      }
+      return 0;
+    });
+
+  const getImageCount = (data: SectionData[]) =>
+    aggregateBlocks(data, (block) => (block.type === "image" ? 1 : 0));
+
+  const getEmbedCount = (data: SectionData[]) =>
+    aggregateBlocks(data, (block) => (block.type === "embed" ? 1 : 0));
+
+  const wordCount = getWordCount(sections);
+  const imageCount = getImageCount(sections);
+  const embedCount = getEmbedCount(sections);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -216,42 +209,7 @@ export function PublishModal({
                           <div className="font-medium text-sm">{lang.name}</div>
                           <div className="text-xs text-gray-500">
                             {lang.sections.length} sections •{" "}
-                            {lang.sections.reduce((count, section) => {
-                              return (
-                                count +
-                                section.columns.reduce((colCount, column) => {
-                                  return (
-                                    colCount +
-                                    column.blocks.reduce(
-                                      (blockCount, block) => {
-                                        if (
-                                          block.type === "text" &&
-                                          block.content.html
-                                        ) {
-                                          const text =
-                                            block.content.html.replace(
-                                              /<[^>]*>/g,
-                                              ""
-                                            );
-                                          return (
-                                            blockCount +
-                                            text
-                                              .split(/\s+/)
-                                              .filter(
-                                                (word: string) =>
-                                                  word.length > 0
-                                              ).length
-                                          );
-                                        }
-                                        return blockCount;
-                                      },
-                                      0
-                                    )
-                                  );
-                                }, 0)
-                              );
-                            }, 0)}{" "}
-                            words
+                            {getWordCount(lang.sections)} words
                           </div>
                         </div>
                         {lang.isDefault && (

@@ -8,6 +8,18 @@ interface BlogPreviewProps {
 }
 
 export function BlogPreview({ sections }: BlogPreviewProps) {
+  const getRowGridStyles = (columnCount: number) => {
+    if (columnCount <= 1) {
+      return { gridTemplateColumns: "minmax(0, 1fr)" };
+    }
+
+    const minWidth = columnCount >= 4 ? 220 : columnCount === 3 ? 240 : 280;
+
+    return {
+      gridTemplateColumns: `repeat(auto-fit, minmax(${minWidth}px, 1fr))`,
+    };
+  };
+
   const renderBlock = (block: any) => {
     switch (block.type) {
       case "text":
@@ -77,14 +89,8 @@ export function BlogPreview({ sections }: BlogPreviewProps) {
     return url;
   };
 
-  const getColumnClass = (columnCount: number) => {
-    if (columnCount === 1) return "grid-cols-1";
-    if (columnCount === 2) return "grid-cols-1 lg:grid-cols-2";
-    return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
-  };
-
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl w-full mx-auto px-4 sm:px-6">
       {/* Blog Header */}
       <div className="text-center mb-12 pb-8 border-b">
         <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mb-4">
@@ -107,8 +113,8 @@ export function BlogPreview({ sections }: BlogPreviewProps) {
       {/* Blog Content */}
       <article>
         {sections.map((section, sectionIndex) => (
-          <section key={section.id} className="relative">
-            {/* Section divider for multiple sections */}
+          <section key={section.id} className="relative space-y-8">
+            {/* Section divider placeholder kept for future use */}
             {/* {sectionIndex > 0 && (
               <div className="flex items-center justify-center mb-12">
                 <div className="w-16 h-px bg-gray-300"></div>
@@ -117,15 +123,19 @@ export function BlogPreview({ sections }: BlogPreviewProps) {
               </div>
             )} */}
 
-            <div
-              className={`grid gap-8 ${getColumnClass(section.columns.length)}`}
-            >
-              {section.columns.map((column) => (
-                <div key={column.id} className="space-y-6">
-                  {column.blocks.map(renderBlock)}
-                </div>
-              ))}
-            </div>
+            {section.rows.map((row) => (
+              <div
+                key={row.id}
+                className="grid gap-8"
+                style={getRowGridStyles(row.columns.length)}
+              >
+                {row.columns.map((column) => (
+                  <div key={column.id} className="space-y-6">
+                    {column.blocks.map(renderBlock)}
+                  </div>
+                ))}
+              </div>
+            ))}
           </section>
         ))}
       </article>
@@ -152,14 +162,16 @@ export function BlogPreview({ sections }: BlogPreviewProps) {
   function calculateWordCount() {
     let wordCount = 0;
     sections.forEach((section) => {
-      section.columns.forEach((column) => {
-        column.blocks.forEach((block) => {
-          if (block.type === "text" && block.content.html) {
-            const text = block.content.html.replace(/<[^>]*>/g, "");
-            wordCount += text
-              .split(/\s+/)
-              .filter((word: string) => word.length > 0).length;
-          }
+      section.rows.forEach((row) => {
+        row.columns.forEach((column) => {
+          column.blocks.forEach((block) => {
+            if (block.type === "text" && block.content.html) {
+              const text = block.content.html.replace(/<[^>]*>/g, "");
+              wordCount += text
+                .split(/\s+/)
+                .filter((word: string) => word.length > 0).length;
+            }
+          });
         });
       });
     });

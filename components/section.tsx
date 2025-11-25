@@ -1,9 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Columns2, Columns3, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import type { Block, Column as ColumnType, SectionData } from "./blog-editor";
+import type {
+  Block,
+  Column as ColumnType,
+  Row as RowType,
+  SectionData,
+} from "./blog-editor";
 import { Column } from "./column";
 
 interface SectionProps {
@@ -16,70 +21,139 @@ export function Section({ section, onUpdate, onDelete }: SectionProps) {
   const [draggedBlock, setDraggedBlock] = useState<{
     block: Block;
     sourceColumnId: string;
+    sourceRowId: string;
   } | null>(null);
 
-  const addColumn = () => {
-    if (section.columns.length >= 3) return;
+  const generateId = (prefix: string) =>
+    `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
 
-    const newColumn: ColumnType = {
-      id: `col-${Date.now()}`,
-      blocks: [],
-    };
+  const createColumn = (): ColumnType => ({
+    id: generateId("col"),
+    blocks: [],
+  });
 
+  const createRow = (): RowType => ({
+    id: generateId("row"),
+    columns: [createColumn()],
+  });
+
+  const addRow = () => {
     onUpdate(section.id, {
       ...section,
-      columns: [...section.columns, newColumn],
+      rows: [...section.rows, createRow()],
     });
   };
 
-  const removeColumn = (columnId: string) => {
-    if (section.columns.length <= 1) return;
-
+  const removeRow = (rowId: string) => {
+    if (section.rows.length <= 1) return;
     onUpdate(section.id, {
       ...section,
-      columns: section.columns.filter((col) => col.id !== columnId),
+      rows: section.rows.filter((row) => row.id !== rowId),
     });
   };
 
-  const updateColumn = (columnId: string, updatedColumn: ColumnType) => {
+  const addColumn = (rowId: string) => {
     onUpdate(section.id, {
       ...section,
-      columns: section.columns.map((col) =>
-        col.id === columnId ? updatedColumn : col
+      rows: section.rows.map((row) =>
+        row.id === rowId
+          ? { ...row, columns: [...row.columns, createColumn()] }
+          : row
       ),
     });
   };
 
-  const handleDragStart = (block: Block, sourceColumnId: string) => {
-    setDraggedBlock({ block, sourceColumnId });
+  const removeColumn = (rowId: string, columnId: string) => {
+    const targetRow = section.rows.find((row) => row.id === rowId);
+    if (!targetRow || targetRow.columns.length <= 1) return;
+
+    onUpdate(section.id, {
+      ...section,
+      rows: section.rows.map((row) =>
+        row.id === rowId
+          ? {
+              ...row,
+              columns: row.columns.filter((col) => col.id !== columnId),
+            }
+          : row
+      ),
+    });
   };
 
-  const handleDrop = (targetColumnId: string, targetIndex?: number) => {
+  const updateColumn = (
+    rowId: string,
+    columnId: string,
+    updatedColumn: ColumnType
+  ) => {
+    onUpdate(section.id, {
+      ...section,
+      rows: section.rows.map((row) =>
+        row.id === rowId
+          ? {
+              ...row,
+              columns: row.columns.map((col) =>
+                col.id === columnId ? updatedColumn : col
+              ),
+            }
+          : row
+      ),
+    });
+  };
+
+  const handleDragStart = (
+    block: Block,
+    sourceRowId: string,
+    sourceColumnId: string
+  ) => {
+    setDraggedBlock({ block, sourceColumnId, sourceRowId });
+  };
+
+  const handleDrop = (
+    targetRowId: string,
+    targetColumnId: string,
+    targetIndex?: number
+  ) => {
     if (!draggedBlock) return;
 
-    if (targetColumnId === draggedBlock.sourceColumnId) return;
+    if (
+      targetColumnId === draggedBlock.sourceColumnId &&
+      targetRowId === draggedBlock.sourceRowId
+    ) {
+      return;
+    }
 
-    const { block, sourceColumnId } = draggedBlock;
+    const { block, sourceColumnId, sourceRowId } = draggedBlock;
 
-    // Remove from source column
-    const sourceColumn = section.columns.find(
-      (col) => col.id === sourceColumnId
+    const rowsWithoutBlock = section.rows.map((row) => {
+      if (row.id !== sourceRowId) return row;
+      return {
+        ...row,
+        columns: row.columns.map((column) =>
+          column.id === sourceColumnId
+            ? {
+                ...column,
+                blocks: column.blocks.filter((b) => b.id !== block.id),
+              }
+            : column
+        ),
+      };
+    });
+
+    const targetRowIndex = rowsWithoutBlock.findIndex(
+      (row) => row.id === targetRowId
     );
-    if (!sourceColumn) return;
+    if (targetRowIndex === -1) return;
 
-    const updatedSourceColumn = {
-      ...sourceColumn,
-      blocks: sourceColumn.blocks.filter((b) => b.id !== block.id),
-    };
-
-    // Add to target column
-    const targetColumn = section.columns.find(
-      (col) => col.id === targetColumnId
+    const targetRow = rowsWithoutBlock[targetRowIndex];
+    const targetColumnIndex = targetRow.columns.findIndex(
+      (column) => column.id === targetColumnId
     );
-    if (!targetColumn) return;
+    if (targetColumnIndex === -1) return;
 
+    const targetColumn = targetRow.columns[targetColumnIndex];
     const insertIndex =
       targetIndex !== undefined ? targetIndex : targetColumn.blocks.length;
+
     const updatedTargetColumn = {
       ...targetColumn,
       blocks: [
@@ -89,49 +163,35 @@ export function Section({ section, onUpdate, onDelete }: SectionProps) {
       ],
     };
 
-    // Update section
+    const finalRows = rowsWithoutBlock.map((row) => {
+      if (row.id !== targetRowId) return row;
+      return {
+        ...row,
+        columns: row.columns.map((column) =>
+          column.id === targetColumnId ? updatedTargetColumn : column
+        ),
+      };
+    });
+
     onUpdate(section.id, {
       ...section,
-      columns: section.columns.map((col) => {
-        if (col.id === sourceColumnId) return updatedSourceColumn;
-        if (col.id === targetColumnId) return updatedTargetColumn;
-        return col;
-      }),
+      rows: finalRows,
     });
 
     setDraggedBlock(null);
   };
 
-  const getColumnClass = () => {
-    const count = section.columns.length;
-    if (count === 1) return "grid-cols-1";
-    if (count === 2) return "grid-cols-1 md:grid-cols-2";
-    return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3";
-  };
+  const rowCountLabel = `Section • ${section.rows.length} row${
+    section.rows.length === 1 ? "" : "s"
+  }`;
 
   return (
     <div className="border rounded-lg p-4 bg-gray-50/50">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-700">Section</span>
-          <div className="flex items-center gap-1">
-            {section.columns.length < 3 && (
-              <Button
-                onClick={addColumn}
-                size="sm"
-                variant="ghost"
-                className="h-6 w-6 p-0"
-              >
-                <Plus className="w-3 h-3" />
-              </Button>
-            )}
-            {section.columns.length === 2 && (
-              <Columns2 className="w-3 h-3 text-gray-400" />
-            )}
-            {section.columns.length === 3 && (
-              <Columns3 className="w-3 h-3 text-gray-400" />
-            )}
-          </div>
+          <span className="text-sm font-medium text-gray-700">
+            {rowCountLabel}
+          </span>
         </div>
         <Button
           onClick={() => onDelete(section.id)}
@@ -143,18 +203,77 @@ export function Section({ section, onUpdate, onDelete }: SectionProps) {
         </Button>
       </div>
 
-      <div className={`grid gap-4 ${getColumnClass()}`}>
-        {section.columns.map((column) => (
-          <Column
-            key={column.id}
-            column={column}
-            onUpdate={updateColumn}
-            onRemove={removeColumn}
-            canRemove={section.columns.length > 1}
-            onDragStart={handleDragStart}
-            onDrop={handleDrop}
-          />
+      <div className="space-y-4">
+        {section.rows.map((row, rowIndex) => (
+          <div key={row.id} className="rounded-lg border bg-white p-4">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div className="text-sm font-medium text-gray-600">
+                Row {rowIndex + 1} • {row.columns.length} column
+                {row.columns.length === 1 ? "" : "s"}
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => addColumn(row.id)}
+                  size="sm"
+                  variant="outline"
+                  className="flex items-center gap-1"
+                >
+                  <Plus className="w-3 h-3" />
+                  Add column
+                </Button>
+                {section.rows.length > 1 && (
+                  <Button
+                    onClick={() => removeRow(row.id)}
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 w-7 p-0 text-red-500 hover:text-red-700"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            <div
+              className="grid gap-4"
+              style={{
+                gridTemplateColumns: `repeat(${Math.max(
+                  row.columns.length,
+                  1
+                )}, minmax(0, 1fr))`,
+              }}
+            >
+              {row.columns.map((column) => (
+                <Column
+                  key={column.id}
+                  column={column}
+                  onUpdate={(columnId, updatedColumn) =>
+                    updateColumn(row.id, columnId, updatedColumn)
+                  }
+                  onRemove={(columnId) => removeColumn(row.id, columnId)}
+                  canRemove={row.columns.length > 1}
+                  onDragStart={(block, sourceColumnId) =>
+                    handleDragStart(block, row.id, sourceColumnId)
+                  }
+                  onDrop={(targetColumnId, targetIndex) =>
+                    handleDrop(row.id, targetColumnId, targetIndex)
+                  }
+                />
+              ))}
+            </div>
+          </div>
         ))}
+      </div>
+
+      <div className="mt-4 flex justify-center">
+        <Button
+          onClick={addRow}
+          variant="outline"
+          className="flex items-center gap-2 border-dashed"
+        >
+          <Plus className="w-4 h-4" />
+          Add row
+        </Button>
       </div>
     </div>
   );

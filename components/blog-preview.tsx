@@ -158,7 +158,7 @@ export function BlogPreview({ sections }: BlogPreviewProps) {
             const text = block.content.html.replace(/<[^>]*>/g, "");
             wordCount += text
               .split(/\s+/)
-              .filter((word) => word.length > 0).length;
+              .filter((word: string) => word.length > 0).length;
           }
         });
       });

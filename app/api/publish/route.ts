@@ -1,16 +1,21 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const blogData = await request.json()
+    const blogData = await request.json();
 
     // Validate required fields
-    if (!blogData.title || !blogData.sections) {
-      return NextResponse.json({ error: "Title and sections are required" }, { status: 400 })
+    if (!blogData.title) {
+      return NextResponse.json(
+        { error: "Title and sections are required" },
+        { status: 400 }
+      );
     }
 
     // Generate a unique ID for the blog post
-    const blogId = `blog_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    const blogId = `blog_${Date.now()}_${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
 
     // In a real application, you would:
     // 1. Save to database (MongoDB, PostgreSQL, etc.)
@@ -26,12 +31,12 @@ export async function POST(request: NextRequest) {
       slug: blogData.slug,
       status: blogData.status,
       wordCount: blogData.wordCount,
-      sectionsCount: blogData.sections.length,
+      sectionsCount: blogData.languages[0].sections.length,
       publishedAt: blogData.publishedAt,
-    })
+    });
 
     // Simulate processing time
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Example of what you might save to database:
     const savedBlog = {
@@ -39,7 +44,7 @@ export async function POST(request: NextRequest) {
       title: blogData.title,
       slug: blogData.slug,
       excerpt: blogData.excerpt,
-      content: blogData.sections,
+      content: blogData.languages[0].sections,
       tags: blogData.tags || [],
       category: blogData.category,
       featuredImage: blogData.featuredImage,
@@ -53,7 +58,7 @@ export async function POST(request: NextRequest) {
       // seoTitle: generateSeoTitle(blogData.title),
       // seoDescription: blogData.excerpt,
       // readingTime: Math.ceil(blogData.wordCount / 200),
-    }
+    };
 
     return NextResponse.json({
       success: true,
@@ -61,9 +66,12 @@ export async function POST(request: NextRequest) {
       id: blogId,
       url: `/blog/${blogData.slug}`,
       data: savedBlog,
-    })
+    });
   } catch (error) {
-    console.error("Publish error:", error)
-    return NextResponse.json({ error: "Failed to publish blog post" }, { status: 500 })
+    console.error("Publish error:", error);
+    return NextResponse.json(
+      { error: "Failed to publish blog post" },
+      { status: 500 }
+    );
   }
 }

@@ -1,37 +1,37 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Underline from "@tiptap/extension-underline";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Link from "@tiptap/extension-link";
 import TextAlign from "@tiptap/extension-text-align";
-import { Button } from "@/components/ui/button";
+import Underline from "@tiptap/extension-underline";
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import {
+  AlignCenter,
+  AlignJustify,
+  AlignLeft,
+  AlignRight,
   Bold,
-  Italic,
-  UnderlineIcon,
-  Strikethrough,
   Code,
-  Quote,
+  GripVertical,
+  Italic,
+  LinkIcon,
   List,
   ListOrdered,
-  Undo,
+  Quote,
   Redo,
+  Strikethrough,
   Trash2,
-  GripVertical,
-  LinkIcon,
+  UnderlineIcon,
+  Undo,
   Unlink,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  AlignJustify,
 } from "lucide-react";
 import type { Block } from "../blog-editor";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 
 interface TextBlockProps {
   block: Block;
@@ -85,6 +85,7 @@ export function TextBlock({
   const [linkText, setLinkText] = useState("");
 
   const openLinkDialog = () => {
+    if (!editor) return;
     const { from, to } = editor.state.selection;
     const selectedText = editor.state.doc.textBetween(from, to);
     const existingLink = editor.getAttributes("link");
@@ -95,6 +96,7 @@ export function TextBlock({
   };
 
   const insertLink = () => {
+    if (!editor) return;
     if (!linkUrl.trim()) return;
 
     const { from, to } = editor.state.selection;
@@ -118,6 +120,7 @@ export function TextBlock({
   };
 
   const removeLink = () => {
+    if (!editor) return;
     editor.chain().focus().unsetLink().run();
     setShowLinkDialog(false);
   };

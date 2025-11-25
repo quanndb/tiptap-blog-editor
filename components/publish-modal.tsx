@@ -1,37 +1,43 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { X, Plus, Eye, Send, Globe } from "lucide-react"
-import type { SectionData, LanguageVersion } from "./blog-editor"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Eye, Globe, Plus, Send, X } from "lucide-react";
+import { useState } from "react";
+import type { LanguageVersion, SectionData } from "./blog-editor";
 
 interface PublishModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onPublish: (metadata: any) => Promise<void>
-  sections: SectionData[]
-  languages?: LanguageVersion[]
+  isOpen: boolean;
+  onClose: () => void;
+  onPublish: (metadata: any) => Promise<void>;
+  sections: SectionData[];
+  languages?: LanguageVersion[];
 }
 
-export function PublishModal({ isOpen, onClose, onPublish, sections, languages = [] }: PublishModalProps) {
-  const [title, setTitle] = useState("")
-  const [slug, setSlug] = useState("")
-  const [excerpt, setExcerpt] = useState("")
-  const [tags, setTags] = useState<string[]>([])
-  const [newTag, setNewTag] = useState("")
-  const [category, setCategory] = useState("")
-  const [featuredImage, setFeaturedImage] = useState("")
-  const [status, setStatus] = useState<"draft" | "published">("published")
-  const [isPublishing, setIsPublishing] = useState(false)
-  const [showPreview, setShowPreview] = useState(false)
+export function PublishModal({
+  isOpen,
+  onClose,
+  onPublish,
+  sections,
+  languages = [],
+}: PublishModalProps) {
+  const [title, setTitle] = useState("");
+  const [slug, setSlug] = useState("");
+  const [excerpt, setExcerpt] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState("");
+  const [category, setCategory] = useState("");
+  const [featuredImage, setFeaturedImage] = useState("");
+  const [status, setStatus] = useState<"draft" | "published">("published");
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
-  if (!isOpen) return null
+  if (!isOpen) return null;
 
   const generateSlug = (title: string) => {
     return title
@@ -39,41 +45,41 @@ export function PublishModal({ isOpen, onClose, onPublish, sections, languages =
       .replace(/[^a-z0-9\s-]/g, "")
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-")
-      .trim()
-  }
+      .trim();
+  };
 
   const handleTitleChange = (value: string) => {
-    setTitle(value)
+    setTitle(value);
     if (!slug || slug === generateSlug(title)) {
-      setSlug(generateSlug(value))
+      setSlug(generateSlug(value));
     }
-  }
+  };
 
   const addTag = () => {
     if (newTag.trim() && !tags.includes(newTag.trim())) {
-      setTags([...tags, newTag.trim()])
-      setNewTag("")
+      setTags([...tags, newTag.trim()]);
+      setNewTag("");
     }
-  }
+  };
 
   const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove))
-  }
+    setTags(tags.filter((tag) => tag !== tagToRemove));
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      e.preventDefault()
-      addTag()
+      e.preventDefault();
+      addTag();
     }
-  }
+  };
 
   const handlePublish = async () => {
     if (!title.trim()) {
-      alert("Please enter a title")
-      return
+      alert("Please enter a title");
+      return;
     }
 
-    setIsPublishing(true)
+    setIsPublishing(true);
 
     try {
       await onPublish({
@@ -84,13 +90,13 @@ export function PublishModal({ isOpen, onClose, onPublish, sections, languages =
         category: category.trim(),
         featuredImage: featuredImage.trim(),
         status,
-      })
+      });
     } catch (error) {
-      console.error("Publish failed:", error)
+      console.error("Publish failed:", error);
     } finally {
-      setIsPublishing(false)
+      setIsPublishing(false);
     }
-  }
+  };
 
   const getPreviewData = () => {
     const wordCount = sections.reduce((count, section) => {
@@ -101,44 +107,56 @@ export function PublishModal({ isOpen, onClose, onPublish, sections, languages =
             colCount +
             column.blocks.reduce((blockCount, block) => {
               if (block.type === "text" && block.content.html) {
-                const text = block.content.html.replace(/<[^>]*>/g, "")
-                return blockCount + text.split(/\s+/).filter((word) => word.length > 0).length
+                const text = block.content.html.replace(/<[^>]*>/g, "");
+                return (
+                  blockCount +
+                  text.split(/\s+/).filter((word: string) => word.length > 0)
+                    .length
+                );
               }
-              return blockCount
+              return blockCount;
             }, 0)
-          )
+          );
         }, 0)
-      )
-    }, 0)
+      );
+    }, 0);
 
     const imageCount = sections.reduce((count, section) => {
       return (
         count +
         section.columns.reduce((colCount, column) => {
-          return colCount + column.blocks.filter((block) => block.type === "image").length
+          return (
+            colCount +
+            column.blocks.filter((block) => block.type === "image").length
+          );
         }, 0)
-      )
-    }, 0)
+      );
+    }, 0);
 
     const embedCount = sections.reduce((count, section) => {
       return (
         count +
         section.columns.reduce((colCount, column) => {
-          return colCount + column.blocks.filter((block) => block.type === "embed").length
+          return (
+            colCount +
+            column.blocks.filter((block) => block.type === "embed").length
+          );
         }, 0)
-      )
-    }, 0)
+      );
+    }, 0);
 
-    return { wordCount, imageCount, embedCount }
-  }
+    return { wordCount, imageCount, embedCount };
+  };
 
-  const { wordCount, imageCount, embedCount } = getPreviewData()
+  const { wordCount, imageCount, embedCount } = getPreviewData();
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-semibold text-gray-900">{showPreview ? "Blog Preview" : "Publish Blog Post"}</h2>
+          <h2 className="text-xl font-semibold text-gray-900">
+            {showPreview ? "Blog Preview" : "Publish Blog Post"}
+          </h2>
           <div className="flex items-center gap-2">
             <Button
               onClick={() => setShowPreview(!showPreview)}
@@ -189,7 +207,10 @@ export function PublishModal({ isOpen, onClose, onPublish, sections, languages =
                   </h3>
                   <div className="grid grid-cols-2 gap-3">
                     {languages.map((lang) => (
-                      <div key={lang.code} className="flex items-center gap-2 p-2 bg-white rounded border">
+                      <div
+                        key={lang.code}
+                        className="flex items-center gap-2 p-2 bg-white rounded border"
+                      >
                         <span className="text-lg">{lang.flag}</span>
                         <div className="flex-1">
                           <div className="font-medium text-sm">{lang.name}</div>
@@ -201,16 +222,34 @@ export function PublishModal({ isOpen, onClose, onPublish, sections, languages =
                                 section.columns.reduce((colCount, column) => {
                                   return (
                                     colCount +
-                                    column.blocks.reduce((blockCount, block) => {
-                                      if (block.type === "text" && block.content.html) {
-                                        const text = block.content.html.replace(/<[^>]*>/g, "")
-                                        return blockCount + text.split(/\s+/).filter((word) => word.length > 0).length
-                                      }
-                                      return blockCount
-                                    }, 0)
-                                  )
+                                    column.blocks.reduce(
+                                      (blockCount, block) => {
+                                        if (
+                                          block.type === "text" &&
+                                          block.content.html
+                                        ) {
+                                          const text =
+                                            block.content.html.replace(
+                                              /<[^>]*>/g,
+                                              ""
+                                            );
+                                          return (
+                                            blockCount +
+                                            text
+                                              .split(/\s+/)
+                                              .filter(
+                                                (word: string) =>
+                                                  word.length > 0
+                                              ).length
+                                          );
+                                        }
+                                        return blockCount;
+                                      },
+                                      0
+                                    )
+                                  );
                                 }, 0)
-                              )
+                              );
                             }, 0)}{" "}
                             words
                           </div>
@@ -229,24 +268,32 @@ export function PublishModal({ isOpen, onClose, onPublish, sections, languages =
               <div className="space-y-4">
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">Title</h3>
-                  <p className="text-gray-700">{title || "Untitled Blog Post"}</p>
+                  <p className="text-gray-700">
+                    {title || "Untitled Blog Post"}
+                  </p>
                 </div>
 
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">URL Slug</h3>
-                  <p className="text-gray-600 font-mono text-sm">/{slug || "untitled-blog-post"}</p>
+                  <p className="text-gray-600 font-mono text-sm">
+                    /{slug || "untitled-blog-post"}
+                  </p>
                 </div>
 
                 {excerpt && (
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Excerpt</h3>
+                    <h3 className="font-semibold text-gray-900 mb-2">
+                      Excerpt
+                    </h3>
                     <p className="text-gray-700">{excerpt}</p>
                   </div>
                 )}
 
                 {category && (
                   <div>
-                    <h3 className="font-semibold text-gray-900 mb-2">Category</h3>
+                    <h3 className="font-semibold text-gray-900 mb-2">
+                      Category
+                    </h3>
                     <Badge variant="secondary">{category}</Badge>
                   </div>
                 )}
@@ -266,7 +313,11 @@ export function PublishModal({ isOpen, onClose, onPublish, sections, languages =
 
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">Status</h3>
-                  <Badge variant={status === "published" ? "default" : "secondary"}>{status}</Badge>
+                  <Badge
+                    variant={status === "published" ? "default" : "secondary"}
+                  >
+                    {status}
+                  </Badge>
                 </div>
               </div>
             </div>
@@ -325,7 +376,9 @@ export function PublishModal({ isOpen, onClose, onPublish, sections, languages =
                   <select
                     id="status"
                     value={status}
-                    onChange={(e) => setStatus(e.target.value as "draft" | "published")}
+                    onChange={(e) =>
+                      setStatus(e.target.value as "draft" | "published")
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="draft">Draft</option>
@@ -362,9 +415,16 @@ export function PublishModal({ isOpen, onClose, onPublish, sections, languages =
                 {tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="flex items-center gap-1"
+                      >
                         {tag}
-                        <button onClick={() => removeTag(tag)} className="ml-1 hover:text-red-600">
+                        <button
+                          onClick={() => removeTag(tag)}
+                          className="ml-1 hover:text-red-600"
+                        >
                           <X className="w-3 h-3" />
                         </button>
                       </Badge>
@@ -379,7 +439,9 @@ export function PublishModal({ isOpen, onClose, onPublish, sections, languages =
         <div className="flex items-center justify-between p-6 border-t bg-gray-50">
           <div className="text-sm text-gray-600">
             {sections.length} sections • {wordCount} words
-            {languages.length > 1 && <span className="ml-2">• {languages.length} languages</span>}
+            {languages.length > 1 && (
+              <span className="ml-2">• {languages.length} languages</span>
+            )}
           </div>
           <div className="flex gap-3">
             <Button onClick={onClose} variant="outline">
@@ -399,5 +461,5 @@ export function PublishModal({ isOpen, onClose, onPublish, sections, languages =
         </div>
       </div>
     </div>
-  )
+  );
 }
